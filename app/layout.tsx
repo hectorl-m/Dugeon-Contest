@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Cinzel, MedievalSharp, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
@@ -8,28 +8,23 @@ const _medieval = MedievalSharp({ subsets: ["latin"], weight: ["400"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Hyper-Clicker Dungeon',
+  title: 'Dungeon Conquest',
   description: 'A dark fantasy incremental clicker game - defeat monsters, earn gold, upgrade your arsenal!',
-  generator: 'v0.app',
+  manifest: '/manifest.json',
   icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
+    icon: '/icon.svg',
+    apple: '/icon-512.png', // Apple necesita su propio PNG
   },
-}
+};
 
+// Esto bloquea el zoom con los dedos para que se sienta como una App nativa
+export const viewport: Viewport = {
+  themeColor: '#1A0B02', // El color de la barra de estado del móvil
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 export default function RootLayout({
   children,
 }: Readonly<{

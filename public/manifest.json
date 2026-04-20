@@ -1,0 +1,18 @@
+{
+  "name": "Dungeon Conquest",
+  "short_name": "Dungeon",
+  "description": "A dark fantasy incremental clicker game",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1A0B02",
+  "theme_color": "#F59E0B",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
