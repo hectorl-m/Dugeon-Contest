@@ -170,8 +170,7 @@ export function Tavern({ gold, level, prepareChest, collectChest }: TavernProps)
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-bold text-foreground tracking-wide mb-1">Buy Wooden Chest</div>
-                <div className="text-sm text-muted-foreground mb-2">A true gacha chest with rare riches and common losses.</div>
-                <div className="text-xs text-muted-foreground">70% modest loot, 20% wealthy find, 10% upgrade.</div>
+                <div className="text-sm text-muted-foreground mb-2">A mysterious chest containing scaled gold or rare upgrades.</div>
               </div>
               <div className="flex items-center gap-1.5 shrink-0">
                 <Coins className={`w-5 h-5 ${gold >= getWoodenChestCost() && !chestState && adState === 'idle' ? 'gold-text' : 'text-muted-foreground'}`} />
@@ -191,8 +190,7 @@ export function Tavern({ gold, level, prepareChest, collectChest }: TavernProps)
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-bold text-foreground tracking-wide mb-1">Watch Ad Chest</div>
-                <div className="text-sm text-muted-foreground mb-2">Free massive rewards after communing with spirits.</div>
-                <div className="text-xs text-muted-foreground">Scaled gold or permanent damage boost.</div>
+                <div className="text-sm text-muted-foreground mb-2">Commune with spirits for immense wealth or permanent power.</div>
               </div>
               <div className="flex items-center gap-1.5 shrink-0">
                 <span className="font-bold tabular-nums gold-text">FREE</span>
