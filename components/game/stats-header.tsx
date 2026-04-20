@@ -1,7 +1,7 @@
 "use client";
 
 import { formatNumber } from "@/hooks/use-game";
-import { Swords, Coins, Zap, MousePointerClick, Flame, RotateCcw } from "lucide-react";
+import { Swords, Coins, Zap, MousePointerClick, Flame, RotateCcw, Skull } from "lucide-react";
 
 interface StatsHeaderProps {
   level: number;
@@ -9,6 +9,7 @@ interface StatsHeaderProps {
   dps: number;
   clickDamage: number;
   critChance: number;
+  demonSouls: number;
   onReset: () => void;
 }
 
@@ -18,6 +19,7 @@ export function StatsHeader({
   dps,
   clickDamage,
   critChance,
+  demonSouls,
   onReset,
 }: StatsHeaderProps) {
   return (
@@ -72,6 +74,16 @@ export function StatsHeader({
               <Flame className="w-5 h-5 text-orange-400" />
               <span className="text-muted-foreground text-sm">Crit</span>
               <span className="font-bold text-orange-400">{critChance}%</span>
+            </div>
+          )}
+          
+          {/* Contador de Almas de Prestigio */}
+          {demonSouls > 0 && (
+            <div className="flex items-center gap-2 bg-purple-950/40 px-3 py-1.5 rounded-md border border-purple-800/50 shadow-[0_0_10px_rgba(147,51,234,0.15)]">
+              <Skull className="w-4 h-4 text-purple-400 drop-shadow-[0_0_5px_rgba(168,85,247,0.8)]" />
+              <span className="text-sm font-bold text-purple-200 font-serif tracking-wider">
+                {demonSouls}
+              </span>
             </div>
           )}
         </div>

@@ -5,8 +5,10 @@ import { StatsHeader } from "./stats-header";
 import { Monster } from "./monster";
 import { Shop } from "./shop";
 import { Tavern } from "./tavern";
-import { Scroll, Info } from "lucide-react";
+import { PrestigeModal } from "./prestige-modal";
+import { Scroll, Info, Flame } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState } from "react";
 
 export function GameContainer() {
   const {
@@ -22,11 +24,29 @@ export function GameContainer() {
     resetGame,
     prepareChest,
     collectChest,
+    prestige,
+    calculatePendingSouls,
   } = useGame();
+
+  const [isPrestigeModalOpen, setIsPrestigeModalOpen] = useState(false);
+
+  const pendingSouls = calculatePendingSouls(gameState.level);
+  const newMultiplier = 1 + (gameState.demonSouls + pendingSouls) * 0.1;
+  const isPrestigeAvailable = gameState.level >= 50;
+
+  const handlePrestigeClick = () => {
+    if (isPrestigeAvailable) {
+      setIsPrestigeModalOpen(true);
+    }
+  };
+
+  const handlePrestigeConfirm = () => {
+    prestige();
+    setIsPrestigeModalOpen(false);
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Stats Header */}
       <StatsHeader
         level={gameState.level}
         gold={gameState.gold}
@@ -34,13 +54,11 @@ export function GameContainer() {
         clickDamage={gameState.clickDamage}
         critChance={gameState.critChance}
         onReset={resetGame}
+        demonSouls={gameState.demonSouls}
       />
 
-      {/* Main Game Area */}
       <main className="flex-1 flex flex-col lg:flex-row">
-        {/* Monster Stage */}
         <div className="flex-1 flex items-center justify-center p-4 lg:p-8 relative">
-          {/* Decorative torch effect */}
           <div className="absolute inset-0 bg-gradient-radial from-amber-900/10 via-transparent to-transparent pointer-events-none" />
           
           <Monster
@@ -57,7 +75,6 @@ export function GameContainer() {
           />
         </div>
 
-        {/* Shop Sidebar */}
         <aside className="w-full lg:w-80 xl:w-96 border-t-4 lg:border-t-0 lg:border-l-4 border-border bg-card p-4 lg:p-6 overflow-y-auto">
           <Tabs defaultValue="shop" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-4">
@@ -84,7 +101,34 @@ export function GameContainer() {
             </TabsContent>
           </Tabs>
 
-          {/* Game Tips */}
+          {isPrestigeAvailable && (
+            <div className="mt-6 p-4 rounded medieval-border bg-gradient-to-br from-red-950 to-slate-900 border-2 border-red-800">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Flame className="w-5 h-5 text-red-500 animate-pulse" />
+                  <h3 className="font-bold text-red-400 tracking-wide">Dark Ascension</h3>
+                </div>
+              </div>
+
+              <div className="space-y-2 text-sm mb-4">
+                <p className="text-red-300">
+                  Current Bonus: <span className="font-bold text-amber-300">+{Math.round((newMultiplier - 1) * 100)}%</span> Damage & Gold
+                </p>
+                <p className="text-red-200">
+                  Ascend now to claim <span className="font-bold text-red-300">{pendingSouls}</span> Demon Souls
+                </p>
+              </div>
+
+              <button
+                onClick={handlePrestigeClick}
+                className="w-full bg-gradient-to-r from-red-700 to-red-800 hover:from-red-600 hover:to-red-700 text-white font-bold py-2 px-4 rounded transition-all duration-200 border border-red-600 shadow-lg hover:shadow-red-700/50 flex items-center justify-center gap-2"
+              >
+                <Flame className="w-4 h-4" />
+                Ascend to Greater Power
+              </button>
+            </div>
+          )}
+
           <div className="mt-6 p-4 rounded medieval-border bg-secondary/30">
             <div className="flex items-center gap-2 mb-3">
               <Scroll className="w-5 h-5 gold-text" />
@@ -116,7 +160,15 @@ export function GameContainer() {
         </aside>
       </main>
 
-      {/* Footer */}
+      <PrestigeModal
+        isOpen={isPrestigeModalOpen}
+        onClose={() => setIsPrestigeModalOpen(false)}
+        onConfirm={handlePrestigeConfirm}
+        pendingSouls={pendingSouls}
+        currentMultiplier={newMultiplier}
+        level={gameState.level}
+      />
+
       <footer className="border-t-4 border-border bg-card py-3 text-center">
         <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
           <Info className="w-3 h-3" />

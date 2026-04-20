@@ -25,6 +25,7 @@ export interface GameState {
   isBoss: boolean;
   bossTimer: number;
   upgrades: Upgrade[];
+  demonSouls: number;
 }
 
 export interface DamagePopup {
@@ -119,10 +120,21 @@ const getInitialState = (): GameState => ({
   isBoss: false,
   bossTimer: BOSS_TIMER_DURATION,
   upgrades: initialUpgrades,
+  demonSouls: 0,
 });
 
+// Calculate pending souls based on current level
+const calculatePendingSouls = (level: number): number => {
+  return Math.floor(level / 10);
+};
+
+// Calculate prestige multiplier
+const calculatePrestigeMultiplier = (demonSouls: number): number => {
+  return 1 + demonSouls * 0.1;
+};
+
 // Calculate derived stats - defined outside hook to avoid initialization issues
-const calculateStatsFromUpgrades = (upgrades: Upgrade[]) => {
+const calculateStatsFromUpgrades = (upgrades: Upgrade[], demonSouls: number = 0) => {
   const weaponUpgrade = upgrades.find((u) => u.id === "weapon");
   const mercenaryUpgrade = upgrades.find((u) => u.id === "mercenary");
   const criticalUpgrade = upgrades.find((u) => u.id === "critical");
@@ -131,12 +143,18 @@ const calculateStatsFromUpgrades = (upgrades: Upgrade[]) => {
   const mercLv = mercenaryUpgrade?.level ?? 0;
   const critLv = criticalUpgrade?.level ?? 0;
 
+  const prestigeMultiplier = calculatePrestigeMultiplier(demonSouls);
+
   return {
     // El daño base es 1. Cada nivel aumenta el daño un 20% exponencialmente.
-    clickDamage: weaponLv === 0 ? 1 : Math.floor(1 * Math.pow(1.2, weaponLv)),
+    clickDamage: Math.floor(
+      (weaponLv === 0 ? 1 : Math.floor(1 * Math.pow(1.2, weaponLv))) * prestigeMultiplier
+    ),
     
     // Los mercenarios empiezan dando 5 DPS y crecen un 25% exponencialmente por nivel.
-    dps: mercLv === 0 ? 0 : Math.floor(5 * Math.pow(1.25, mercLv - 1)),
+    dps: Math.floor(
+      (mercLv === 0 ? 0 : Math.floor(5 * Math.pow(1.25, mercLv - 1))) * prestigeMultiplier
+    ),
     
     // El crítico se queda igual (lineal) para que no pase del 100%
     critChance: Math.min(critLv * (criticalUpgrade?.effect ?? 2), 100),
@@ -168,8 +186,8 @@ export function useGame() {
             : defaultUpgrade;
         });
         
-        // Recalculate stats from loaded upgrades
-        const stats = calculateStatsFromUpgrades(mergedUpgrades);
+        // Recalculate stats from loaded upgrades, including prestige bonus
+        const stats = calculateStatsFromUpgrades(mergedUpgrades, parsed.demonSouls);
         
         setGameState((prev) => ({
           ...prev,
@@ -276,8 +294,10 @@ export function useGame() {
         const newHp = prev.currentHp - damage;
 
         if (newHp <= 0) {
-          // Monster defeated - give 20% of max HP as gold
-          const goldReward = Math.max(1, Math.floor(prev.maxHp * 0.2));
+          // Monster defeated - give 20% of max HP as gold, with prestige multiplier
+          const baseGoldReward = Math.max(1, Math.floor(prev.maxHp * 0.2));
+          const prestigeMultiplier = calculatePrestigeMultiplier(prev.demonSouls);
+          const goldReward = Math.floor(baseGoldReward * prestigeMultiplier);
           
           return {
             ...prev,
@@ -353,8 +373,10 @@ export function useGame() {
           const newHp = prev.currentHp - damageToApply;
           
           if (newHp <= 0) {
-            // Monster defeated - give 20% of max HP as gold
-            const goldReward = Math.max(1, Math.floor(prev.maxHp * 0.2));
+            // Monster defeated - give 20% of max HP as gold, with prestige multiplier
+            const baseGoldReward = Math.max(1, Math.floor(prev.maxHp * 0.2));
+            const prestigeMultiplier = calculatePrestigeMultiplier(prev.demonSouls);
+            const goldReward = Math.floor(baseGoldReward * prestigeMultiplier);
             return {
               ...prev,
               currentHp: 0,
@@ -429,7 +451,7 @@ export function useGame() {
         level: upgrade.level + 1,
       };
 
-      const stats = calculateStatsFromUpgrades(newUpgrades);
+      const stats = calculateStatsFromUpgrades(newUpgrades, prev.demonSouls);
 
       return {
         ...prev,
@@ -554,11 +576,28 @@ export function useGame() {
         }
       }
 
-      const stats = calculateStatsFromUpgrades(newUpgrades);
+      const stats = calculateStatsFromUpgrades(newUpgrades, prev.demonSouls);
 
       return {
         ...prev,
         gold: newGold,
+        upgrades: newUpgrades,
+        ...stats,
+      };
+    });
+  }, []);
+
+  // Prestige function
+  const prestige = useCallback(() => {
+    setGameState((prev) => {
+      const pendingSouls = calculatePendingSouls(prev.level);
+      const newDemonSouls = prev.demonSouls + pendingSouls;
+      const newUpgrades = initialUpgrades.map(u => ({ ...u }));
+      const stats = calculateStatsFromUpgrades(newUpgrades, newDemonSouls);
+
+      return {
+        ...getInitialState(),
+        demonSouls: newDemonSouls,
         upgrades: newUpgrades,
         ...stats,
       };
@@ -578,5 +617,7 @@ export function useGame() {
     resetGame,
     prepareChest,
     collectChest,
+    prestige,
+    calculatePendingSouls,
   };
 }
