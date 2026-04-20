@@ -36,6 +36,13 @@ export interface DamagePopup {
   isDps?: boolean;
 }
 
+export interface ChestReward {
+  type: "gold" | "upgrade";
+  amount?: number;
+  upgradeId?: string;
+  message: string;
+}
+
 // Storage key for localStorage
 const STORAGE_KEY = "hyper-clicker-dungeon-save";
 
@@ -454,6 +461,110 @@ export function useGame() {
     setGameState(getInitialState());
   }, []);
 
+  const prepareChest = useCallback((type: 'wooden' | 'ad', level: number): { reward: ChestReward; cost: number } | null => {
+    let reward: ChestReward | null = null;
+    let cost = 0;
+
+    if (type === 'wooden') {
+      cost = Math.floor(200 * Math.pow(1.15, level - 1));
+    } else {
+      cost = 0; // Ad chest is free
+    }
+
+    const rand = Math.random();
+    let loot: ChestReward;
+
+    if (type === 'wooden') {
+      if (rand < 0.7) {
+        const minGold = Math.floor(cost * 0.5);
+        const maxGold = Math.floor(cost * 1.2);
+        const goldAmount = Math.floor(Math.random() * (maxGold - minGold + 1)) + minGold;
+        loot = {
+          type: 'gold',
+          amount: goldAmount,
+          message: `A MODEST LOOT... ${formatNumber(goldAmount).toUpperCase()} GOLD`,
+        };
+      } else if (rand < 0.9) {
+        const minGold = Math.floor(cost * 2);
+        const maxGold = Math.floor(cost * 3);
+        const goldAmount = Math.floor(Math.random() * (maxGold - minGold + 1)) + minGold;
+        loot = {
+          type: 'gold',
+          amount: goldAmount,
+          message: `A WEALTHY FIND! ${formatNumber(goldAmount).toUpperCase()} GOLD`,
+        };
+      } else {
+        const upgradeIds = ['weapon', 'mercenary', 'critical'];
+        const upgradeNames = ['Weapon Upgrade', 'Mercenaries', 'Critical Hit'];
+        const randomIndex = Math.floor(Math.random() * upgradeIds.length);
+        const randomUpgradeId = upgradeIds[randomIndex];
+        const randomUpgradeName = upgradeNames[randomIndex];
+        loot = {
+          type: 'upgrade',
+          upgradeId: randomUpgradeId,
+          amount: 1,
+          message: `YOU GAINED +1 ${randomUpgradeName}!`,
+        };
+      }
+    } else {
+      // Ad chest - guaranteed high value
+      if (rand < 0.7) {
+        // EL ARREGLO: Base de 5000 (10 veces más que el de madera) pero escalando a 1.2
+        const goldAmount = Math.floor(2000 * Math.pow(1.15, level - 1));
+        loot = { type: 'gold', amount: goldAmount, message: `YOU FOUND ${formatNumber(goldAmount).toUpperCase()} GOLD!` };
+      } else {
+        // Mejora mejorada: ¡En lugar de +1, el anuncio te da +2 niveles para que merezca más la pena!
+        loot = { type: 'upgrade', upgradeId: 'permanent_damage', amount: 2, message: 'YOU GAINED +2 PERMANENT CLICK DAMAGE!' };
+      }
+    }
+
+    reward = loot;
+
+    return { reward, cost };
+  }, []);
+
+  const collectChest = useCallback((reward: ChestReward | null, cost: number = 0) => {
+    if (!reward) return;
+
+    setGameState((prev) => {
+      let newGold = prev.gold - cost; // Deduct cost here
+      let newUpgrades = [...prev.upgrades];
+
+      if (reward.type === 'gold' && reward.amount) {
+        newGold += reward.amount;
+      }
+
+      if (reward.type === 'upgrade' && reward.upgradeId && reward.amount) {
+        if (reward.upgradeId === 'permanent_damage') {
+          const weaponIndex = newUpgrades.findIndex((u) => u.id === 'weapon');
+          if (weaponIndex !== -1) {
+            newUpgrades[weaponIndex] = {
+              ...newUpgrades[weaponIndex],
+              level: newUpgrades[weaponIndex].level + reward.amount,
+            };
+          }
+        } else {
+          const upgradeIndex = newUpgrades.findIndex((u) => u.id === reward.upgradeId);
+          if (upgradeIndex !== -1) {
+            newUpgrades[upgradeIndex] = {
+              ...newUpgrades[upgradeIndex],
+              level: newUpgrades[upgradeIndex].level + reward.amount,
+            };
+          }
+        }
+      }
+
+      const stats = calculateStatsFromUpgrades(newUpgrades);
+
+      return {
+        ...prev,
+        gold: newGold,
+        upgrades: newUpgrades,
+        ...stats,
+      };
+    });
+  }, []);
+
   return {
     gameState,
     damagePopups,
@@ -465,5 +576,7 @@ export function useGame() {
     getUpgradeCost,
     canAfford,
     resetGame,
+    prepareChest,
+    collectChest,
   };
 }

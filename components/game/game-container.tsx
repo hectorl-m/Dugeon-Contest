@@ -4,7 +4,9 @@ import { useGame } from "@/hooks/use-game";
 import { StatsHeader } from "./stats-header";
 import { Monster } from "./monster";
 import { Shop } from "./shop";
+import { Tavern } from "./tavern";
 import { Scroll, Info } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function GameContainer() {
   const {
@@ -18,6 +20,8 @@ export function GameContainer() {
     getUpgradeCost,
     canAfford,
     resetGame,
+    prepareChest,
+    collectChest,
   } = useGame();
 
   return (
@@ -55,12 +59,30 @@ export function GameContainer() {
 
         {/* Shop Sidebar */}
         <aside className="w-full lg:w-80 xl:w-96 border-t-4 lg:border-t-0 lg:border-l-4 border-border bg-card p-4 lg:p-6 overflow-y-auto">
-          <Shop
-            upgrades={gameState.upgrades}
-            onPurchase={purchaseUpgrade}
-            getUpgradeCost={getUpgradeCost}
-            canAfford={canAfford}
-          />
+          <Tabs defaultValue="shop" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="shop">Blacksmith</TabsTrigger>
+              <TabsTrigger value="tavern">Tavern</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="shop" className="mt-0">
+              <Shop
+                upgrades={gameState.upgrades}
+                onPurchase={purchaseUpgrade}
+                getUpgradeCost={getUpgradeCost}
+                canAfford={canAfford}
+              />
+            </TabsContent>
+
+            <TabsContent value="tavern" className="mt-0">
+              <Tavern
+                gold={gameState.gold}
+                level={gameState.level}
+                prepareChest={prepareChest}
+                collectChest={collectChest}
+              />
+            </TabsContent>
+          </Tabs>
 
           {/* Game Tips */}
           <div className="mt-6 p-4 rounded medieval-border bg-secondary/30">
