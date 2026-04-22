@@ -48,41 +48,41 @@ export function PrestigeModal({
           </div>
 
           <AlertDialogDescription className="space-y-4 text-center">
-            <div className="text-red-300 font-semibold text-lg">
+            <span className="block mt-2 text-red-300 font-semibold text-lg">
               THE POINT OF NO RETURN
-            </div>
+            </span>
 
-            <div className="space-y-3 text-sm">
-              <div className="p-3 bg-red-950/50 rounded border border-red-800">
-                <p className="text-red-200 font-semibold">Current Stage: {level}</p>
-                <p className="text-red-400 mt-2">
+            <span className="block mt-2 space-y-3 text-sm flex flex-col">
+              <span className="block p-3 bg-red-950/50 rounded border border-red-800 flex flex-col">
+                <span className="text-red-200 font-semibold">Current Stage: {level}</span>
+                <span className="text-red-400 mt-2 block">
                   You will earn <span className="text-red-300 font-bold text-lg">{pendingSouls}</span> DEMON SOULS
-                </p>
-              </div>
+                </span>
+              </span>
 
-              <div className="p-3 bg-slate-900/50 rounded border border-slate-700">
-                <p className="text-slate-300 text-xs mb-2">Upon ascension:</p>
-                <ul className="text-slate-300 space-y-1 text-xs">
-                  <li>✗ All gold will be lost</li>
-                  <li>✗ All upgrades will be reset to level 0</li>
-                  <li>✗ You will return to Stage 1</li>
-                  <li>✓ You will keep all Demon Souls</li>
-                </ul>
-              </div>
+              <span className="block p-3 bg-slate-900/50 rounded border border-slate-700 flex flex-col">
+                <span className="text-slate-300 text-xs mb-2">Upon ascension:</span>
+                <span className="text-slate-300 space-y-1 text-xs flex flex-col items-center">
+                  <span className="block">✗ All gold will be lost</span>
+                  <span className="block">✗ All upgrades will be reset to level 0</span>
+                  <span className="block">✗ You will return to Stage 1</span>
+                  <span className="block text-purple-300">✓ You will keep all Demon Souls</span>
+                </span>
+              </span>
 
-              <div className="p-3 bg-amber-950/50 rounded border border-amber-700">
-                <p className="text-amber-300 font-semibold">
+              <span className="block p-3 bg-amber-950/50 rounded border border-amber-700 flex flex-col">
+                <span className="text-amber-300 font-semibold">
                   New Multiplier: +{Math.round((currentMultiplier - 1) * 100)}% Power
-                </p>
-                <p className="text-amber-200 text-xs mt-2">
+                </span>
+                <span className="text-amber-200 text-xs mt-2 block">
                   (+{pendingSouls * 10}% Damage & Gold from {pendingSouls} new souls)
-                </p>
-              </div>
-            </div>
+                </span>
+              </span>
+            </span>
 
-            <div className="text-red-400 text-sm font-bold">
+            <span className="text-red-400 text-sm font-bold block mt-4">
               ARE YOU READY TO ASCEND TO GREATER POWER?
-            </div>
+            </span>
           </AlertDialogDescription>
         </AlertDialogHeader>
 
