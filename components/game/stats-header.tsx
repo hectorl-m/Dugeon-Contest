@@ -47,10 +47,10 @@ export function StatsHeader({
           {/* Total Clicks */}
           <div className="flex items-center gap-2 px-3 py-2 rounded medieval-border bg-secondary/50">
             <MousePointerClick className="w-5 h-5 text-foreground" />
-            <span className="text-muted-foreground text-sm">Total</span>
+            <span className="text-muted-foreground text-sm">Total Clicks</span>
             <span className="font-bold text-foreground">{formatNumber(totalClicks)}</span>
           </div>
-          
+
           {/* Level */}
           <div className="flex items-center gap-2 px-3 py-2 rounded medieval-border bg-secondary/50">
             <span className="text-muted-foreground text-sm">Stage</span>
