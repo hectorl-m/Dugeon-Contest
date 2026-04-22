@@ -22,6 +22,7 @@ export interface GameState {
   dps: number;
   clickDamage: number;
   critChance: number;
+  totalClicks: number;
   isBoss: boolean;
   bossTimer: number;
   upgrades: Upgrade[];
@@ -117,6 +118,7 @@ const getInitialState = (): GameState => ({
   dps: 0,
   clickDamage: 1,
   critChance: 0,
+  totalClicks: 0,
   isBoss: false,
   bossTimer: BOSS_TIMER_DURATION,
   upgrades: initialUpgrades,
@@ -330,6 +332,10 @@ export function useGame() {
       const isCrit = Math.random() * 100 < gameState.critChance;
       const damage = isCrit ? gameState.clickDamage * 5 : gameState.clickDamage;
 
+      setGameState((prev) => ({
+        ...prev,
+        totalClicks: prev.totalClicks + 1,
+      }));
       dealDamage(damage, isCrit, x, y);
     },
     [gameState.clickDamage, gameState.critChance, dealDamage]
@@ -605,6 +611,7 @@ export function useGame() {
         ...getInitialState(),
         demonSouls: newDemonSouls,
         upgrades: newUpgrades,
+        totalClicks: prev.totalClicks,
         ...stats,
       };
     });

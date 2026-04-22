@@ -53,6 +53,7 @@ export function GameContainer() {
         dps={gameState.dps}
         clickDamage={gameState.clickDamage}
         critChance={gameState.critChance}
+        totalClicks={gameState.totalClicks}
         onReset={resetGame}
         demonSouls={gameState.demonSouls}
       />

@@ -9,6 +9,7 @@ interface StatsHeaderProps {
   dps: number;
   clickDamage: number;
   critChance: number;
+  totalClicks: number;
   demonSouls: number;
   onReset: () => void;
 }
@@ -19,6 +20,7 @@ export function StatsHeader({
   dps,
   clickDamage,
   critChance,
+  totalClicks,
   demonSouls,
   onReset,
 }: StatsHeaderProps) {
@@ -42,6 +44,13 @@ export function StatsHeader({
 
         {/* Stats Row */}
         <div className="flex flex-wrap gap-3 md:gap-5">
+          {/* Total Clicks */}
+          <div className="flex items-center gap-2 px-3 py-2 rounded medieval-border bg-secondary/50">
+            <MousePointerClick className="w-5 h-5 text-foreground" />
+            <span className="text-muted-foreground text-sm">Total</span>
+            <span className="font-bold text-foreground">{formatNumber(totalClicks)}</span>
+          </div>
+          
           {/* Level */}
           <div className="flex items-center gap-2 px-3 py-2 rounded medieval-border bg-secondary/50">
             <span className="text-muted-foreground text-sm">Stage</span>
