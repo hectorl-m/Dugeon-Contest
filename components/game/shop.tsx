@@ -9,6 +9,7 @@ interface ShopProps {
   onPurchase: (upgradeId: string) => void;
   getUpgradeCost: (upgradeId: string) => number;
   canAfford: (upgradeId: string) => boolean;
+  demonSouls: number;
 }
 
 // Get icon for upgrade type
@@ -40,14 +41,15 @@ const getEffectDescription = (upgrade: Upgrade): string => {
 };
 
 // Get current bonus based on upgrade level
-const getCurrentBonus = (upgrade: Upgrade): string => {
+const getCurrentBonus = (upgrade: Upgrade, demonSouls: number): string => {
+  const damageMultiplier = 1 + demonSouls * 0.1;
   switch (upgrade.id) {
     case "weapon":
       const dmg = upgrade.level === 0 ? 1 : Math.floor(1 * Math.pow(1.2, upgrade.level));
-      return `Total: ${formatNumber(dmg)} damage`;
+      return `Total: ${formatNumber(dmg * damageMultiplier)} damage`;
     case "mercenary":
       const dps = upgrade.level === 0 ? 0 : Math.floor(5 * Math.pow(1.25, upgrade.level - 1));
-      return `Total: ${formatNumber(dps)} DPS`;
+      return `Total: ${formatNumber(dps * damageMultiplier)} DPS`;
     case "critical":
       return `${Math.min(upgrade.level * upgrade.effect, 100)}% chance`;
     default:
@@ -55,7 +57,7 @@ const getCurrentBonus = (upgrade: Upgrade): string => {
   }
 };
 
-export function Shop({ upgrades, onPurchase, getUpgradeCost, canAfford }: ShopProps) {
+export function Shop({ upgrades, onPurchase, getUpgradeCost, canAfford, demonSouls }: ShopProps) {
   return (
     <div className="w-full">
       <div className="flex items-center gap-3 mb-5">
@@ -100,7 +102,7 @@ export function Shop({ upgrades, onPurchase, getUpgradeCost, canAfford }: ShopPr
                   </div>
                   {upgrade.level > 0 && (
                     <div className="text-xs gold-text">
-                      Current: {getCurrentBonus(upgrade)}
+                      Current: {getCurrentBonus(upgrade, demonSouls)}
                     </div>
                   )}
                 </div>

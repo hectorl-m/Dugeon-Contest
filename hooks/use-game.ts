@@ -128,9 +128,14 @@ const calculatePendingSouls = (level: number): number => {
   return Math.floor(level / 10);
 };
 
-// Calculate prestige multiplier
-const calculatePrestigeMultiplier = (demonSouls: number): number => {
+// Calculate prestige multiplier for damage
+const calculateDamageMultiplier = (demonSouls: number): number => {
   return 1 + demonSouls * 0.1;
+};
+
+// Calculate prestige multiplier for gold
+const calculateGoldMultiplier = (demonSouls: number): number => {
+  return 1 + demonSouls * 0.05;
 };
 
 // Calculate derived stats - defined outside hook to avoid initialization issues
@@ -143,17 +148,17 @@ const calculateStatsFromUpgrades = (upgrades: Upgrade[], demonSouls: number = 0)
   const mercLv = mercenaryUpgrade?.level ?? 0;
   const critLv = criticalUpgrade?.level ?? 0;
 
-  const prestigeMultiplier = calculatePrestigeMultiplier(demonSouls);
+  const damageMultiplier = calculateDamageMultiplier(demonSouls);
 
   return {
     // El daño base es 1. Cada nivel aumenta el daño un 20% exponencialmente.
     clickDamage: Math.floor(
-      (weaponLv === 0 ? 1 : Math.floor(1 * Math.pow(1.2, weaponLv))) * prestigeMultiplier
+      (weaponLv === 0 ? 1 : Math.floor(1 * Math.pow(1.2, weaponLv))) * damageMultiplier
     ),
     
     // Los mercenarios empiezan dando 5 DPS y crecen un 25% exponencialmente por nivel.
     dps: Math.floor(
-      (mercLv === 0 ? 0 : Math.floor(5 * Math.pow(1.25, mercLv - 1))) * prestigeMultiplier
+      (mercLv === 0 ? 0 : Math.floor(5 * Math.pow(1.25, mercLv - 1))) * damageMultiplier
     ),
     
     // El crítico se queda igual (lineal) para que no pase del 100%
@@ -296,8 +301,8 @@ export function useGame() {
         if (newHp <= 0) {
           // Monster defeated - give 20% of max HP as gold, with prestige multiplier
           const baseGoldReward = Math.max(1, Math.floor(prev.maxHp * 0.2));
-          const prestigeMultiplier = calculatePrestigeMultiplier(prev.demonSouls);
-          const goldReward = Math.floor(baseGoldReward * prestigeMultiplier);
+          const goldMultiplier = calculateGoldMultiplier(prev.demonSouls);
+          const goldReward = Math.floor(baseGoldReward * goldMultiplier);
           
           return {
             ...prev,
@@ -375,8 +380,8 @@ export function useGame() {
           if (newHp <= 0) {
             // Monster defeated - give 20% of max HP as gold, with prestige multiplier
             const baseGoldReward = Math.max(1, Math.floor(prev.maxHp * 0.2));
-            const prestigeMultiplier = calculatePrestigeMultiplier(prev.demonSouls);
-            const goldReward = Math.floor(baseGoldReward * prestigeMultiplier);
+            const goldMultiplier = calculateGoldMultiplier(prev.demonSouls);
+            const goldReward = Math.floor(baseGoldReward * goldMultiplier);
             return {
               ...prev,
               currentHp: 0,
@@ -472,9 +477,10 @@ export function useGame() {
   // Check if can afford upgrade
   const canAfford = useCallback(
     (upgradeId: string): boolean => {
+      if (upgradeId === "critical" && gameState.critChance >= 100) return false;
       return gameState.gold >= getUpgradeCost(upgradeId);
     },
-    [gameState.gold, getUpgradeCost]
+    [gameState.gold, gameState.critChance, getUpgradeCost]
   );
 
   // Reset game

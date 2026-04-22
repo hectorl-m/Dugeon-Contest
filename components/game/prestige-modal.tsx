@@ -75,7 +75,7 @@ export function PrestigeModal({
                   New Multiplier: +{Math.round((currentMultiplier - 1) * 100)}% Power
                 </span>
                 <span className="text-amber-200 text-xs mt-2 block">
-                  (+{pendingSouls * 10}% Damage & Gold from {pendingSouls} new souls)
+                  (+{pendingSouls * 10}% Damage & +{pendingSouls * 5}% Gold from {pendingSouls} new souls)
                 </span>
               </span>
             </span>

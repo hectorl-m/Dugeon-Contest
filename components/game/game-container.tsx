@@ -88,6 +88,7 @@ export function GameContainer() {
                 onPurchase={purchaseUpgrade}
                 getUpgradeCost={getUpgradeCost}
                 canAfford={canAfford}
+                demonSouls={gameState.demonSouls}
               />
             </TabsContent>
 
