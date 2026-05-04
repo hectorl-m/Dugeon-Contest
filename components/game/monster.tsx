@@ -18,21 +18,21 @@ interface MonsterProps {
 }
 
 // Monster appearances based on level ranges
-const getMonsterEmoji = (level: number, isBoss: boolean): string => {
+const getMonsterSprite = (level: number, isBoss: boolean): string => {
   if (isBoss) {
-    if (level >= 90) return "🐉";
-    if (level >= 70) return "👹";
-    if (level >= 50) return "🧟";
-    if (level >= 30) return "👿";
-    return "💀";
+    if (level >= 90) return "sprites/ancient_dragon_boss.png";
+    if (level >= 70) return "sprites/demon_lord_boss.png";
+    if (level >= 50) return "sprites/undead_king_boss.png";
+    if (level >= 30) return "sprites/dark_overlord_boss.png";
+    return "sprites/skeleton_lord_boss.png";
   }
   
-  if (level >= 80) return "🦇";
-  if (level >= 60) return "🐺";
-  if (level >= 40) return "🕷️";
-  if (level >= 20) return "🐀";
-  if (level >= 10) return "👻";
-  return "🦴";
+  if (level >= 80) return "sprites/vampire_bat.png";
+  if (level >= 60) return "sprites/dire_wolf.png";
+  if (level >= 40) return "sprites/giant_spider.png";
+  if (level >= 20) return "sprites/rat_dungeon.png";
+  if (level >= 10) return "sprites/wandering_ghost.png";
+  return "sprites/skeleton_minion.png";
 };
 
 const getMonsterName = (level: number, isBoss: boolean): string => {
@@ -65,7 +65,7 @@ export function Monster({
   onClick,
 }: MonsterProps) {
   const hpPercentage = Math.max(0, (currentHp / maxHp) * 100);
-  const monsterEmoji = getMonsterEmoji(level, isBoss);
+  const monsterSprite = getMonsterSprite(level, isBoss);
   const monsterName = getMonsterName(level, isBoss);
   const bossTimerMax = 60;
 
@@ -153,13 +153,14 @@ export function Monster({
         <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-primary/40" />
 
         {/* Monster Emoji */}
-        <span
-          className={`text-8xl md:text-9xl transition-transform torch-glow ${
-            isBoss ? "drop-shadow-[0_0_20px_rgba(255,215,0,0.5)]" : "drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]"
+        <img
+          src={monsterSprite}
+          alt={monsterName}
+          className={`w-32 h-32 md:w-48 md:h-48 object-contain transition-transform torch-glow ${
+            isBoss ? "drop-shadow-[0_0_20px_rgba(255,215,0,0.5)] scale-125" : "drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]"
           }`}
-        >
-          {monsterEmoji}
-        </span>
+          style={{ imageRendering: "pixelated" }} // Mantener esto para que no se vea borroso al ampliar
+        />
 
         {/* Damage Popups */}
         {damagePopups.map((popup) => (
